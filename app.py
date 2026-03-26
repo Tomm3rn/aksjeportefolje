@@ -20,10 +20,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Opprett tabeller ved oppstart (kjøres av gunicorn i produksjon)
-with app.app_context():
-    db.create_all()
-
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -40,6 +36,11 @@ class Holding(db.Model):
     shares = db.Column(db.Float, nullable=False)
     portfolio_type = db.Column(db.String(20), nullable=False)  # 'utbytte' eller 'vekst'
     added_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# Opprett tabeller ved oppstart (kjøres av gunicorn i produksjon)
+with app.app_context():
+    db.create_all()
 
 
 # Enkel cache for å unngå for mange API-kall
