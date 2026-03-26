@@ -1,0 +1,71 @@
+body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.portfolio-card-utbytte {
+    border-left: 4px solid #198754 !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fff4 100%);
+}
+
+.portfolio-card-vekst {
+    border-left: 4px solid #ffc107 !important;
+    background: linear-gradient(135deg, #ffffff 0%, #fffdf0 100%);
+}
+
+.table th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6c757d;
+    font-weight: 600;
+    border-top: none;
+}
+
+.table td {
+    font-size: 0.92rem;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.modal-content {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+}

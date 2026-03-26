@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Opprett konto{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h4 class="mb-4 text-center fw-bold">
+                    <i class="bi bi-person-plus text-success me-2"></i>Opprett konto
+                </h4>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Brukernavn</label>
+                        <input type="text" name="username" class="form-control" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Passord <span class="text-muted small">(minst 6 tegn)</span></label>
+                        <input type="password" name="password" class="form-control" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 mt-2">Opprett konto</button>
+                </form>
+                <hr>
+                <p class="text-center mb-0 text-muted small">
+                    Har du konto? <a href="{{ url_for('login') }}">Logg inn</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
