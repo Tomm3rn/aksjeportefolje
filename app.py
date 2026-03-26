@@ -8,6 +8,8 @@ import os
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'bytt-denne-i-produksjon-123!')
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Render.com bruker postgres://, SQLAlchemy krever postgresql://
 database_url = os.environ.get('DATABASE_URL', 'sqlite:///portfolio.db')
@@ -17,6 +19,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+# Opprett tabeller ved oppstart (kjøres av gunicorn i produksjon)
+with app.app_context():
+    db.create_all()
 
 
 class User(db.Model):
@@ -193,9 +199,18 @@ def add_stock():
         return redirect(url_for('dashboard'))
 
     portfolio_type = request.form['portfolio_type']
+    if portfolio_type not in ('utbytte', 'vekst'):
+        flash('Ugyldig porteføljetype', 'danger')
+        return redirect(url_for('dashboard'))
 
     if '.' not in ticker:
         ticker += '.OL'
+
+    # Verifiser at tickeren finnes
+    info = get_stock_info(ticker)
+    if not info['valid'] or info['price'] == 0:
+        flash(f'Fant ikke aksjen "{ticker}". Sjekk at ticker-koden er riktig.', 'danger')
+        return redirect(url_for('dashboard'))
 
     holding = Holding(
         user_id=session['user_id'],
