@@ -11,9 +11,6 @@
                     <div>
                         <p class="text-muted small mb-1">UTBYTTE-PORTEFØLJE</p>
                         <h3 class="fw-bold mb-0">{{ "{:,.0f}".format(utbytte_sum.value) }} kr</h3>
-                        <span class="badge {% if utbytte_gain_pct >= 0 %}bg-success{% else %}bg-danger{% endif %} mt-1">
-                            {% if utbytte_gain_pct >= 0 %}+{% endif %}{{ "%.1f"|format(utbytte_gain_pct) }}% avkastning
-                        </span>
                     </div>
                     <div class="text-end">
                         <p class="text-muted small mb-1">EST. ÅRLIG UTBYTTE</p>
@@ -30,13 +27,6 @@
                     <div>
                         <p class="text-muted small mb-1">VEKST-PORTEFØLJE</p>
                         <h3 class="fw-bold mb-0">{{ "{:,.0f}".format(vekst_sum.value) }} kr</h3>
-                        <span class="badge {% if vekst_gain_pct >= 0 %}bg-success{% else %}bg-danger{% endif %} mt-1">
-                            {% if vekst_gain_pct >= 0 %}+{% endif %}{{ "%.1f"|format(vekst_gain_pct) }}% avkastning
-                        </span>
-                    </div>
-                    <div class="text-end">
-                        <p class="text-muted small mb-1">INVESTERT</p>
-                        <h5 class="fw-bold">{{ "{:,.0f}".format(vekst_sum.cost) }} kr</h5>
                     </div>
                 </div>
             </div>
@@ -66,9 +56,8 @@
                     <tr>
                         <th>Aksje</th>
                         <th class="text-end">Antall</th>
-                        <th class="text-end">Kjøpskurs</th>
-                        <th class="text-end">Nåverdi</th>
-                        <th class="text-end">+/- %</th>
+                        <th class="text-end">Kurs</th>
+                        <th class="text-end">Verdi</th>
                         <th class="text-end">Utbytte%</th>
                         <th class="text-end">Årsutbytte</th>
                         <th></th>
@@ -82,16 +71,13 @@
                             <div class="text-muted small">{{ h.name[:30] }}</div>
                         </td>
                         <td class="text-end">{{ h.shares|int if h.shares == h.shares|int else h.shares }}</td>
-                        <td class="text-end">{{ "{:,.2f}".format(h.purchase_price) }}</td>
                         <td class="text-end">
                             <div>{{ "{:,.2f}".format(h.current_price) }}</div>
                             <div class="small {% if h.change_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
                                 {% if h.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ "%.2f"|format(h.change_pct|abs) }}%
                             </div>
                         </td>
-                        <td class="text-end fw-semibold {% if h.gain_loss_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
-                            {% if h.gain_loss_pct >= 0 %}+{% endif %}{{ "%.1f"|format(h.gain_loss_pct) }}%
-                        </td>
+                        <td class="text-end fw-semibold">{{ "{:,.0f}".format(h.current_value) }} kr</td>
                         <td class="text-end text-success">{{ "%.1f"|format(h.dividend_yield) }}%</td>
                         <td class="text-end text-success">{{ "{:,.0f}".format(h.annual_dividend) }} kr</td>
                         <td class="text-end">
@@ -132,10 +118,8 @@
                     <tr>
                         <th>Aksje</th>
                         <th class="text-end">Antall</th>
-                        <th class="text-end">Kjøpskurs</th>
-                        <th class="text-end">Nåkurs</th>
-                        <th class="text-end">+/- kr</th>
-                        <th class="text-end">+/- %</th>
+                        <th class="text-end">Kurs</th>
+                        <th class="text-end">Verdi</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -147,19 +131,13 @@
                             <div class="text-muted small">{{ h.name[:30] }}</div>
                         </td>
                         <td class="text-end">{{ h.shares|int if h.shares == h.shares|int else h.shares }}</td>
-                        <td class="text-end">{{ "{:,.2f}".format(h.purchase_price) }}</td>
                         <td class="text-end">
                             <div>{{ "{:,.2f}".format(h.current_price) }}</div>
                             <div class="small {% if h.change_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
                                 {% if h.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ "%.2f"|format(h.change_pct|abs) }}%
                             </div>
                         </td>
-                        <td class="text-end fw-semibold {% if h.gain_loss >= 0 %}text-success{% else %}text-danger{% endif %}">
-                            {% if h.gain_loss >= 0 %}+{% endif %}{{ "{:,.0f}".format(h.gain_loss) }} kr
-                        </td>
-                        <td class="text-end fw-semibold {% if h.gain_loss_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
-                            {% if h.gain_loss_pct >= 0 %}+{% endif %}{{ "%.1f"|format(h.gain_loss_pct) }}%
-                        </td>
+                        <td class="text-end fw-semibold">{{ "{:,.0f}".format(h.current_value) }} kr</td>
                         <td class="text-end">
                             <form method="POST" action="{{ url_for('delete_stock', holding_id=h.id) }}" onsubmit="return confirm('Fjerne {{ h.ticker }}?')">
                                 <button type="submit" class="btn btn-link btn-sm text-danger p-0">
@@ -196,18 +174,12 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Ticker <span class="text-muted fw-normal">(f.eks. EQNR, DNB, AKER)</span></label>
-                        <input type="text" name="ticker" class="form-control" placeholder="EQNR" required>
-                        <div class="form-text">Skriv ticker-koden. Oslo Børs-aksjer får automatisk .OL-suffiks.</div>
+                        <input type="text" name="ticker" class="form-control" placeholder="EQNR" required autofocus>
+                        <div class="form-text">Oslo Børs-aksjer får automatisk .OL-suffiks.</div>
                     </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col">
-                            <label class="form-label fw-semibold">Antall aksjer</label>
-                            <input type="number" name="shares" class="form-control" placeholder="100" step="any" min="0.01" required>
-                        </div>
-                        <div class="col">
-                            <label class="form-label fw-semibold">Kjøpskurs (kr)</label>
-                            <input type="number" name="purchase_price" class="form-control" placeholder="320.50" step="any" min="0.01" required>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Antall aksjer</label>
+                        <input type="number" name="shares" class="form-control" placeholder="100" step="any" min="0.01" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Porteføljetype</label>

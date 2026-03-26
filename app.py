@@ -37,7 +37,6 @@ class Holding(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     ticker = db.Column(db.String(20), nullable=False)
     shares = db.Column(db.Float, nullable=False)
-    purchase_price = db.Column(db.Float, nullable=False)
     portfolio_type = db.Column(db.String(20), nullable=False)  # 'utbytte' eller 'vekst'
     added_date = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -133,15 +132,12 @@ def dashboard():
     utbytte = []
     vekst = []
 
-    utbytte_sum = {'value': 0, 'cost': 0, 'dividends': 0}
-    vekst_sum = {'value': 0, 'cost': 0}
+    utbytte_sum = {'value': 0, 'dividends': 0}
+    vekst_sum = {'value': 0}
 
     for h in holdings:
         info = get_stock_info(h.ticker)
         current_value = info['price'] * h.shares
-        cost = h.purchase_price * h.shares
-        gain_loss = current_value - cost
-        gain_loss_pct = ((current_value - cost) / cost * 100) if cost > 0 else 0
         annual_dividend = current_value * (info['dividend_yield'] / 100)
 
         row = {
@@ -149,12 +145,8 @@ def dashboard():
             'ticker': h.ticker,
             'name': info['name'],
             'shares': h.shares,
-            'purchase_price': h.purchase_price,
             'current_price': info['price'],
             'current_value': current_value,
-            'cost': cost,
-            'gain_loss': gain_loss,
-            'gain_loss_pct': gain_loss_pct,
             'dividend_yield': info['dividend_yield'],
             'annual_dividend': annual_dividend,
             'currency': info['currency'],
@@ -165,15 +157,10 @@ def dashboard():
         if h.portfolio_type == 'utbytte':
             utbytte.append(row)
             utbytte_sum['value'] += current_value
-            utbytte_sum['cost'] += cost
             utbytte_sum['dividends'] += annual_dividend
         else:
             vekst.append(row)
             vekst_sum['value'] += current_value
-            vekst_sum['cost'] += cost
-
-    utbytte_gain_pct = ((utbytte_sum['value'] - utbytte_sum['cost']) / utbytte_sum['cost'] * 100) if utbytte_sum['cost'] > 0 else 0
-    vekst_gain_pct = ((vekst_sum['value'] - vekst_sum['cost']) / vekst_sum['cost'] * 100) if vekst_sum['cost'] > 0 else 0
 
     return render_template('dashboard.html',
         username=session['username'],
@@ -181,8 +168,6 @@ def dashboard():
         vekst=vekst,
         utbytte_sum=utbytte_sum,
         vekst_sum=vekst_sum,
-        utbytte_gain_pct=utbytte_gain_pct,
-        vekst_gain_pct=vekst_gain_pct,
         last_updated=datetime.now().strftime('%d.%m.%Y %H:%M'),
     )
 
@@ -193,9 +178,8 @@ def add_stock():
     ticker = request.form['ticker'].upper().strip()
     try:
         shares = float(request.form['shares'].replace(',', '.'))
-        purchase_price = float(request.form['purchase_price'].replace(',', '.'))
     except ValueError:
-        flash('Ugyldig tall for antall aksjer eller kjøpskurs', 'danger')
+        flash('Ugyldig tall for antall aksjer', 'danger')
         return redirect(url_for('dashboard'))
 
     portfolio_type = request.form['portfolio_type']
@@ -216,7 +200,6 @@ def add_stock():
         user_id=session['user_id'],
         ticker=ticker,
         shares=shares,
-        purchase_price=purchase_price,
         portfolio_type=portfolio_type
     )
     db.session.add(holding)
