@@ -35,7 +35,7 @@ class User(db.Model):
 
 class Holding(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     ticker = db.Column(db.String(20), nullable=False)
     shares = db.Column(db.Float, nullable=False)
     portfolio_type = db.Column(db.String(20), nullable=False)  # 'utbytte' eller 'vekst'
