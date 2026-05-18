@@ -69,3 +69,53 @@ body {
     border-color: #198754;
     box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
 }
+
+/* Mobil-kort for aksjer */
+.stock-card:last-child {
+    border-bottom: none !important;
+}
+
+.stock-card:active {
+    background-color: #f8f9fa;
+}
+
+/* Flytende legg-til-knapp (mobil) */
+.fab {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 0;
+}
+
+/* Navbar kompakt på mobil */
+@media (max-width: 575px) {
+    .navbar .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .navbar .btn-outline-light {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .navbar .opacity-75 {
+        font-size: 0.8rem;
+    }
+
+    /* Gi litt luft under navbar så FAB ikke dekker innhold */
+    body {
+        padding-bottom: 4rem;
+    }
+}
